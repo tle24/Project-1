@@ -1,0 +1,14 @@
+---
+title: "Project 1"
+author: "Tamdan Le, Alise Miller"
+format: html
+editor: visual
+---
+
+## Data Processing
+
+## Call It and Combine Your Data
+
+## Writing a Generic Function for Summarizing
+
+## Put It Together
