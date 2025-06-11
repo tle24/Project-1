@@ -26,6 +26,12 @@ readData <- function(filepath, columns= "!area_name & !STCOU") {
 ```{r}
 readData("./data/EDU01b.csv")
 ```
+### Function for Step 3
+
+```{r}
+
+```
+
 
 ## Call It and Combine Your Data
 
