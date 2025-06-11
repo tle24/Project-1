@@ -1,0 +1,54 @@
+---
+title: "Project 1"
+author: "Tamdan L, Alise M"
+format: pdf
+editor: visual
+---
+
+## Question 1 Reading in and selecting data
+
+```{r}
+library(tidyverse)
+library(readr)
+EDU01A <-read_csv("data/EDU01A.csv")
+EDU01A |>
+  select(Area_name, STCOU, ends_with("D")) |>
+  rename(area_name = Area_name) |>
+  head(EDU01A, n=5)
+```
+
+## Question 2 Convert to long format
+
+```{r}
+EDU01A_long<-
+  EDU01A |>
+  select(Area_name, STCOU, ends_with("D")) |>
+  rename(area_name = Area_name) |>
+  pivot_longer(cols= ends_with("D"),
+               names_to = "EDU_combined",
+               values_to = "enrollment_value"
+               ) 
+  head(EDU01A_long, n=5)
+  
+  
+```
+
+## Question 3 Parsing
+
+```{r}
+EDU01A_longer <-
+  EDU01A_long |>
+  mutate(two_digit_year= (substr(EDU_combined, start=8, stop = 9)) ,
+  year_dbl = as.double(two_digit_year), 
+  year= if_else(year_dbl >25, 1900 + year_dbl, year_dbl <=25 + 2000),
+  survey_value = substr(EDU_combined, start=1, stop = 7)
+         )
+EDU01A_longer
+long_updated <- select(EDU01A_longer, area_name,STCOU, enrollment_value,year, survey_value)
+
+head(long_updated, n=5)
+
+  
+```
+
+## Question 4
