@@ -46,7 +46,9 @@ EDU01A_longer <-
 EDU01A_longer
 long_updated <- select(EDU01A_longer, area_name,STCOU, enrollment_value,year, survey_value)
 
-long_updated
+head(long_updated, n=5)
 
   
 ```
+
+## Question 4
