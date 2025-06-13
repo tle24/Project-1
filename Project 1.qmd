@@ -17,16 +17,83 @@ library(tidyverse)
 readData <- function(filepath, columns= "!area_name & !STCOU") {
   data2 <- read.csv(filepath)
   filterdata <- select(data2, c(area_name = "Area_name", "STCOU"), ends_with("D"))
-  print(head(filterdata, 5))
-  long_data <- pivot_longer(filterdata, cols = (!area_name & !STCOU), names_to = "enrollment", values_to = "value")
-  print(head(long_data, 5))
+  long_data <- pivot_longer(filterdata, cols = (!area_name & !STCOU), names_to = "EDU_combined", values_to = "enrollment_value")
 }
 ```
 
 ```{r}
-readData("./data/EDU01b.csv")
+result2 <- readData("./data/EDU01b.csv")
+head(result2, 5)
 ```
+
 ### Function for Step 3
+
+
+```{r}
+dataYear <- function(step2) {
+  long_updated = mutate(step2, year_dbl= as.double(substr(EDU_combined, start=8, stop = 9)),
+  year = if_else(year_dbl > 25, 1900 + year_dbl, 2000 + year_dbl),
+  survey_value = substr(EDU_combined, start=1, stop = 7)
+         )
+  long_updated <- subset(long_updated, select = -year_dbl)
+}
+```
+
+```{r}
+result3 <- dataYear(result2)
+head(result3, 5)
+```
+
+### Function for Step 5
+
+```{r}
+state_function <- function(county_tibble){
+  new_county_tibble <- county_tibble |>
+  mutate(State = substr(area_name, start = nchar(area_name)-1, stop = nchar(area_name)))
+  return(new_county_tibble)
+}
+```
+
+
+### Function for Step 6
+
+```{r}
+division_function <- function(noncounty_tibble) {
+  noncounty_tibble_updated <- noncounty_tibble |>
+  filter(area_name != "District of Columbia") |>
+  mutate(Division = ifelse(area_name %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", "RHODE ISLAND", "VERMONT"), "Division of New England"),
+  ifelse(area_name %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA"), "Division of Mid-Atlantic"),
+  ifelse(area_name %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", "WISCONSIN"), "Division of East North Central"),
+  ifelse(area_name %in% c("IOWA", "KANSAS", "MINNESOTA", "MISSOURI", "NEBRASKA", "NORTH DAKOTA", "SOUTH DAKOTA"), "Division of West North Central"),
+  ifelse(area_name %in% c("DELAWARE", "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA"), "Division of South Atlantic"),
+  ifelse(area_name %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", "TENNESSEE"), "Division of East South Central"),
+  ifelse(area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS"), "Division of West South Central"),
+  ifelse(area_name %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", "NEW MEXICO", "UTAH", "WYOMING"), "Division of Mountain"),
+  ifelse(area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON"), "Division of Pacific"),
+  return(noncounty_tibble_updated))
+}
+
+```
+
+
+### Function for Step 4
+
+```{r}
+create_datasets <- function(long_data) {
+  county_indices <- grep(pattern = ", \\w\\w", long_data$area_name)
+  noncounty_tibble <- long_data[-county_indices, ]
+  class(noncounty_tibble) <- c("state", class(noncounty_tibble))
+  county_tibble <- long_data[county_indices, ]
+  class(county_tibble) <- c("county", class(county_tibble))
+  final_county_tibble <- state_function(county_tibble)
+  final_noncounty_tibble <- division_function(noncounty_tibble)
+  return(list(county = final_county_tibble, noncounty = final_noncounty_tibble))
+}
+
+create_datasets(result3)
+```
+
+### Wrapper Function
 
 ```{r}
 
