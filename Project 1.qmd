@@ -84,8 +84,15 @@ result4
 ### Wrapper Function
 
 ```{r}
-
+my_wrapper <- function(url, value = "Enrollment Value"){
+  result <- read_csv(url) |>
+  readData(value = value) |>
+  dataYear() |>
+  create_datasets()
+  return(result)
+}
 ```
+
 
 ## Call It and Combine Your Data
 
