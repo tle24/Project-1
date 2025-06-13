@@ -76,6 +76,9 @@ mutate(state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
 ## Question 6 Non-county "division"
 ```{r}
 noncounty_tibble |>
-  mutate(division = if_else (area_name %in% ))
+  mutate(division = if_else (area_name %in% state.name,
+  state.division [match(area_name, state.name)], "ERROR")
+  )
+
 ```
 
