@@ -7,6 +7,32 @@ editor: visual
 
 ## Data Processing
 
+### Function for Steps 1 and 2
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+readData <- function(filepath, columns= "!area_name & !STCOU") {
+  data2 <- read.csv(filepath)
+  filterdata <- select(data2, c(area_name = "Area_name", "STCOU"), ends_with("D"))
+  print(head(filterdata, 5))
+  long_data <- pivot_longer(filterdata, cols = (!area_name & !STCOU), names_to = "enrollment", values_to = "value")
+  print(head(long_data, 5))
+}
+```
+
+```{r}
+readData("./data/EDU01b.csv")
+```
+### Function for Step 3
+
+```{r}
+
+```
+
+
 ## Call It and Combine Your Data
 
 ## Writing a Generic Function for Summarizing
