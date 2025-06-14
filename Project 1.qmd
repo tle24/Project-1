@@ -210,21 +210,14 @@ combined_data <-combine (Data_1A,Data_1B)
 ## Writing a Generic Function for Summarizing
 
 ```{r}
-plot.function
-getS3method("plot","data.frame")
-```
-```{r}
-combined_data[[2]] |>
-  group_by(division, year) |>
-  summarise(mean(enrollment_value))
-```
-
-
-```{r}
 plot.state <- function(df, var_name = "enrollment_value") {
-  df[[2]] |> 
+  ggplot(df[[2]] |> 
+    filter(division != "ERROR") |>
     group_by(division, year) |> 
-    summarise(mean(get(var_name)))
+    mutate(mean = mean(get(var_name))), 
+    aes(x = year, y = mean, color = division)) +
+    geom_line(aes(color = division)) +
+    labs(x = "Year", y = "Mean of Enrollment Values", title = "State plot per Division")
 }
 ```
 
