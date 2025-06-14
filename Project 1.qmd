@@ -6,6 +6,81 @@ editor: visual
 ---
 
 ## Data Processing
+```{r}
+library(tidyverse)
+library(readr)
+EDU01A <-read_csv("data/EDU01a.csv")
+EDU01A |>
+  select(Area_name, STCOU, ends_with("D")) |>
+  rename(area_name = Area_name) |>
+  head(EDU01A, n=5)
+```
+
+## Question 2 Convert to long format
+
+```{r}
+EDU01A_long<-
+  EDU01A |>
+  select(Area_name, STCOU, ends_with("D")) |>
+  rename(area_name = Area_name) |>
+  pivot_longer(cols= ends_with("D"),
+               names_to = "EDU_combined",
+               values_to = "enrollment_value"
+               ) 
+  head(EDU01A_long, n=5)
+  
+  
+```
+
+## Question 3 Parsing
+
+```{r}
+EDU01A_longer <-
+  EDU01A_long |>
+  mutate(two_digit_year= (substr(EDU_combined, start=8, stop = 9)) ,
+  year_dbl = as.double(two_digit_year), 
+  year= if_else(year_dbl >25, 1900 + year_dbl, year_dbl <=25 + 2000),
+  survey_value = substr(EDU_combined, start=1, stop = 7)
+         )
+EDU01A_longer
+long_updated <- select(EDU01A_longer, area_name,STCOU, enrollment_value,year, survey_value)
+
+head(long_updated, n=5)
+
+  
+```
+
+## Question 4 Two Tibbles
+
+```{r}
+County_indices <- grep(pattern = ", [A-Z]{2}", long_updated$area_name)
+noncounty_tibble <- long_updated [-County_indices, ]
+county_tibble <- long_updated [County_indices, ]
+
+class(county_tibble) <- c("county", class(county_tibble))
+class(noncounty_tibble) <- c("state", class(noncounty_tibble))
+
+head(county_tibble, n=10)
+head(noncounty_tibble, n=10)
+```
+
+## Question 5 County level new variable
+
+```{r}
+county_tibble |>
+mutate(state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
+)
+```
+
+## Question 6 Non-county "division"
+```{r}
+noncounty_tibble |>
+  mutate(division = if_else (area_name %in% state.name,
+  state.division [match(area_name, state.name)], "ERROR")
+  )
+
+```
+
 
 ### Function for Steps 1 and 2
 
@@ -90,9 +165,8 @@ my_wrapper <- function(url, value = "Enrollment Value"){
   dataYear() |>
   create_datasets()
   return(result)
-}
+}  
 ```
-
 
 ## Call It and Combine Your Data
 
