@@ -6,6 +6,7 @@ editor: visual
 ---
 
 ## Data Processing
+
 ```{r}
 library(tidyverse)
 library(readr)
@@ -16,7 +17,7 @@ EDU01A |>
   head(EDU01A, n=5)
 ```
 
-## Question 2 Convert to long format
+#### Question 2 Convert to long format
 
 ```{r}
 EDU01A_long<-
@@ -32,7 +33,7 @@ EDU01A_long<-
   
 ```
 
-## Question 3 Parsing
+#### Question 3 Parsing
 
 ```{r}
 EDU01A_longer <-
@@ -50,7 +51,7 @@ head(long_updated, n=5)
   
 ```
 
-## Question 4 Two Tibbles
+#### Question 4 Two Tibbles
 
 ```{r}
 County_indices <- grep(pattern = ", [A-Z]{2}", long_updated$area_name)
@@ -64,7 +65,7 @@ head(county_tibble, n=10)
 head(noncounty_tibble, n=10)
 ```
 
-## Question 5 County level new variable
+#### Question 5 County level new variable
 
 ```{r}
 county_tibble |>
@@ -72,13 +73,24 @@ mutate(state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
 )
 ```
 
-## Question 6 Non-county "division"
+#### Question 6 Non-county "division"
+
 ```{r}
 noncounty_tibble |>
-  mutate(division = if_else (area_name %in% state.name,
-  state.division [match(area_name, state.name)], "ERROR")
-  )
-
+  mutate(division = 
+           case_when( 
+  state %in% c("CT", "ME", "MA", "NH", "RI", "VT") ~"New England",
+  state %in% c("NJ", "NY", "PA") ~ "Mid-Atlantic",
+  state %in% c("IL", "IN" , "MI", "OH", "WI") ~ "East North Central",
+  state %in% c("IA", "KS", "MN","NE", "ND", "SD") ~ "West North Central" ,
+  state %in% c("DE","DC", "FL", "GA", "MD", "NC", "SC", "VA", "WV") ~ "South Atlantic" ,
+  state %in% c("AL", "KY", "MS", "TN") ~ "East South Central" ,
+  state %in% c("AR", "LA", "OK", "TX") ~ "West South Central" ,
+  state %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY") ~ "Mountain",
+  state %in% c("AK", "CA", "HI", "OR", "WA") ~"Pacific",
+  TRUE ~ "ERROR" )
+)
+```
 ```
 
 
