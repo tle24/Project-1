@@ -76,7 +76,7 @@ mutate(state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
 #### Question 6 Non-county "division"
 
 ```{r}
-noncounty_tibble2 <- noncounty_tibble |>
+noncounty_tibble <- noncounty_tibble |>
   mutate(
     state = sub(".*,\\s*", "", area_name),
 division = case_when( 
@@ -182,6 +182,19 @@ my_wrapper <- function(url, value = "Enrollment Value"){
 ```
 
 ## Call It and Combine Your Data
+```{r}
+Data_1A <-my_wrapper("data/EDU01a.csv")
+Data_1B <-my_wrapper("data/EDU01b.csv")
+
+combine <-function (input1,input2) { 
+all_county <-bind_rows(input1[[1]], input2[[1]])
+all_noncounty<-bind_rows(input1[[2]], input2[[2]])
+return(list(all_county, all_noncounty))
+}
+combined_data <-combine (Data_1A,Data_1B)
+  
+```
+
 
 ## Writing a Generic Function for Summarizing
 
