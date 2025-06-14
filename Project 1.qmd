@@ -76,22 +76,23 @@ mutate(state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
 #### Question 6 Non-county "division"
 
 ```{r}
-noncounty_tibble |>
-  mutate(division = 
-           case_when( 
-  state %in% c("CT", "ME", "MA", "NH", "RI", "VT") ~"New England",
-  state %in% c("NJ", "NY", "PA") ~ "Mid-Atlantic",
-  state %in% c("IL", "IN" , "MI", "OH", "WI") ~ "East North Central",
-  state %in% c("IA", "KS", "MN","NE", "ND", "SD") ~ "West North Central" ,
-  state %in% c("DE","DC", "FL", "GA", "MD", "NC", "SC", "VA", "WV") ~ "South Atlantic" ,
-  state %in% c("AL", "KY", "MS", "TN") ~ "East South Central" ,
-  state %in% c("AR", "LA", "OK", "TX") ~ "West South Central" ,
-  state %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY") ~ "Mountain",
-  state %in% c("AK", "CA", "HI", "OR", "WA") ~"Pacific",
+noncounty_tibble2 <- noncounty_tibble |>
+  mutate(
+    state = sub(".*,\\s*", "", area_name),
+division = case_when( 
+  state %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", "RHODE ISLAND", "VERMONT") ~ "New England",
+      state %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA") ~ "Mid-Atlantic",
+      state %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", "WISCONSIN") ~ "East North Central",
+      state %in% c("IOWA", "KANSAS", "MINNESOTA", "NEBRASKA", "NORTH DAKOTA", "SOUTH DAKOTA") ~ "West North Central",
+      state %in% c("DELAWARE", "DISTRICT OF COLUMBIA","District of Columbia", "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
+      state %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", "TENNESSEE") ~ "East South Central",
+      state %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS") ~ "West South Central",
+      state %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", "NEW MEXICO", "UTAH", "WYOMING") ~ "Mountain",
+      state %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
   TRUE ~ "ERROR" )
 )
 ```
-```
+
 
 
 ### Function for Steps 1 and 2
