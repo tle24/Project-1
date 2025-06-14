@@ -1,7 +1,7 @@
 ---
 title: "Project 1"
 author: "Tamdan Le, Alise Miller"
-format: html
+format: pdf
 editor: visual
 ---
 
@@ -93,8 +93,6 @@ division = case_when(
 )
 ```
 
-
-
 ### Function for Steps 1 and 2
 
 ```{r}
@@ -135,8 +133,9 @@ head(result3, 5)
 
 ```{r}
 state_function <- function(county_tibble){
-  mutate(state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
+  new_county_tibble <- mutate(county_tibble, state = substr(area_name, nchar(area_name) - 1, nchar(area_name))
          )
+  return(new_county_tibble)
 }
 ```
 
@@ -144,10 +143,20 @@ state_function <- function(county_tibble){
 
 ```{r}
 division_function <- function(noncounty_tibble) {
-  mutate(division = if_else (area_name %in% state.name,
-                             state.division [match(area_name, state.name)],
-                             "ERROR")
-  )
+  new_noncounty_tibble <- mutate(noncounty_tibble,
+    state = sub(".*,\\s*", "", area_name),
+    division = case_when(state %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", "RHODE ISLAND", "VERMONT") ~ "New England",
+                         state %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA") ~ "Mid-Atlantic",
+                         state %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", "WISCONSIN") ~ "East North Central",
+                         state %in% c("IOWA", "KANSAS", "MINNESOTA", "NEBRASKA", "NORTH DAKOTA", "SOUTH DAKOTA") ~ "West North Central",
+                         state %in% c("DELAWARE", "DISTRICT OF COLUMBIA","District of Columbia", "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
+                         state %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", "TENNESSEE") ~ "East South Central",
+                         state %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS") ~ "West South Central",
+                         state %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", "NEW MEXICO", "UTAH", "WYOMING") ~ "Mountain",
+                         state %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
+                         TRUE ~ "ERROR" )
+    )
+  return(new_noncounty_tibble)
 }
 ```
 
@@ -160,7 +169,9 @@ create_datasets <- function(long_data) {
   county_tibble <- long_updated[County_indices, ]
   class(county_tibble) <- c("county", class(county_tibble))
   class(noncounty_tibble) <- c("state", class(noncounty_tibble))
-  return(list(county_tibble, noncounty_tibble))
+  final_county_tibble <- state_function(county_tibble)
+  final_noncounty_tibble <- division_function(noncounty_tibble)
+  return(list(final_county_tibble, final_noncounty_tibble))
 }
 ```
 
@@ -182,6 +193,7 @@ my_wrapper <- function(url, value = "Enrollment Value"){
 ```
 
 ## Call It and Combine Your Data
+
 ```{r}
 Data_1A <-my_wrapper("data/EDU01a.csv")
 Data_1B <-my_wrapper("data/EDU01b.csv")
@@ -195,7 +207,30 @@ combined_data <-combine (Data_1A,Data_1B)
   
 ```
 
-
 ## Writing a Generic Function for Summarizing
+
+```{r}
+plot.function
+getS3method("plot","data.frame")
+```
+```{r}
+combined_data[[2]] |>
+  group_by(division, year) |>
+  summarise(mean(enrollment_value))
+```
+
+
+```{r}
+plot.state <- function(df, var_name = "enrollment_value") {
+  df[[2]] |> 
+    group_by(division, year) |> 
+    summarise(mean(get(var_name)))
+}
+```
+
+```{r}
+plot.state(combined_data)
+```
+
 
 ## Put It Together
