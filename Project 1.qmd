@@ -225,5 +225,34 @@ plot.state <- function(df, var_name = "enrollment_value") {
 plot.state(combined_data)
 ```
 
+```{r}
+newdat <- combined_data[[1]] |>
+  filter(state == "NC") |>
+  group_by(area_name) |>
+  mutate(mean = mean(enrollment_value))
+
+newdat
+```
+
+
+```{r}
+plot.county <- function(df, state_name = "NC", var_name = "enrollment_value", sortby = "top", sortvalue = 5) {
+  newdf <- df[[1]] |> 
+    filter(state == state_name) |>
+    group_by(area_name) |>
+    mutate(mean = mean(get(var_name)))
+  vec <- newdf[[get(var_name)]]
+  if (sortby == "top") {
+    return(sort(vec, decreasing = TRUE))
+  } else if (sortby == "bottom") {
+    return(sort(vec))
+  }
+}
+```
+
+```{r}
+plot.county(combined_data)
+```
+
 
 ## Put It Together
