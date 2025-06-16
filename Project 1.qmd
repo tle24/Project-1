@@ -217,21 +217,13 @@ plot.state <- function(df, var_name = "enrollment_value") {
     mutate(mean = mean(get(var_name))), 
     aes(x = year, y = mean, color = division)) +
     geom_line(aes(color = division)) +
-    labs(x = "Year", y = "Mean of Enrollment Values", title = "State plot per Division")
+    labs(x = "Year", y = "Mean of Enrollment Values", title = "State plot by Division") +
+    scale_color_discrete(name = "Division")
 }
 ```
 
 ```{r}
 plot.state(combined_data)
-```
-
-```{r}
-newdat <- combined_data[[1]] |>
-  filter(state == "NC") |>
-  group_by(area_name) |>
-  mutate(mean = mean(enrollment_value))
-
-newdat
 ```
 
 
@@ -241,17 +233,22 @@ plot.county <- function(df, state_name = "NC", var_name = "enrollment_value", so
     filter(state == state_name) |>
     group_by(area_name) |>
     mutate(mean = mean(get(var_name)))
-  vec <- newdf[[get(var_name)]]
-  if (sortby == "top") {
-    return(sort(vec, decreasing = TRUE))
+  sortdf <- if (sortby == "top") {
+    head(arrange(newdf, desc(mean)), n = sortvalue)
   } else if (sortby == "bottom") {
-    return(sort(vec))
+    head(arrange(newdf, mean), n = sortvalue)
   }
+  ggplot(sortdf, 
+    aes(x = year, y = get(var_name), color = area_name)
+  ) +
+    geom_line(aes(color = area_name)) +
+    labs(x = "Year", y = var_name, title = "County plot") +
+    scale_color_discrete(name = "Area Name")
 }
 ```
 
 ```{r}
-plot.county(combined_data)
+plot.county(combined_data, state_name = "NC", sortby = "top", sortvalue = 50)
 ```
 
 
