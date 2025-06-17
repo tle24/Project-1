@@ -262,6 +262,56 @@ combined_enrolled <- combine (EDU01AWrapped,EDU01BWrapped)
 ```
 
 ```{r}
-plot.state(combined_enrolled[[2]])
+plot.state(combined_enrolled)
 ```
 
+```{r}
+plot.county(combined_enrolled, sortvalue = 20)
+```
+
+```{r}
+plot.county(combined_enrolled, state_name = "SC", var_name = "enrollment_value", sortby = "bottom", sortvalue = 7 )
+```
+
+```{r}
+plot.county(combined_enrolled)
+```
+
+```{r}
+plot.county(combined_enrolled, state_name = "PA", sortby = "top", sortvalue = 8 )
+```
+
+```{r}
+PST01a <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01a.csv")
+PST01b <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01b.csv")
+PST01c <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01c.csv")
+PST01d <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01d.csv")
+
+```
+
+```{r}
+Combined_PST01ab<-combine(PST01a,PST01b)
+Combined_PST01cd <-combine(PST01c, PST01d)
+Combined_PST01all <- combine(Combined_PST01ab, Combined_PST01cd )
+
+```
+
+```{r}
+plot.state(Combined_PST01all)
+```
+
+```{r}
+plot.county(Combined_PST01all, state_name = "CA", sortby = "top", sortvalue = 15)
+```
+
+```{r}
+plot.county(Combined_PST01all, state_name = "TX", sortby = "top", sortvalue = 4)
+```
+
+```{r}
+plot.county(Combined_PST01all)
+```
+
+```{r}
+plot.county(Combined_PST01all, state_name = "NY", sortby = "top", sortvalue = 10)
+```
