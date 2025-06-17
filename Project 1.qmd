@@ -226,7 +226,6 @@ plot.state <- function(df, var_name = "enrollment_value") {
 plot.state(combined_data)
 ```
 
-
 ```{r}
 plot.county <- function(df, state_name = "NC", var_name = "enrollment_value", sortby = "top", sortvalue = 5) {
   newdf <- df[[1]] |> 
@@ -251,5 +250,18 @@ plot.county <- function(df, state_name = "NC", var_name = "enrollment_value", so
 plot.county(combined_data, state_name = "NC", sortby = "top", sortvalue = 50)
 ```
 
-
 ## Put It Together
+
+```{r}
+EDU01AWrapped <-my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
+EDU01BWrapped <-my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
+```
+
+```{r}
+combined_enrolled <- combine (EDU01AWrapped,EDU01BWrapped)
+```
+
+```{r}
+plot.state(combined_enrolled[[2]])
+```
+
